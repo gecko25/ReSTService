@@ -12,6 +12,7 @@ var app = express(); //create an instance of express so we can use all the cool 
 var db = mongoose.connect('mongodb://localhost/bookAPI');
 
 //Mongoose translates data from mongodb using a model
+//This is the mongoose model for our book
 var Book = require('./models/bookModel');
 
 
