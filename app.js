@@ -7,6 +7,8 @@ var express  = require('express'),
     mongoose = require('mongoose');
 
 var app = express(); //create an instance of express so we can use all the cool functionality it provides:D
+
+//starts up our database
 var db = mongoose.connect('mongodb://localhost/bookAPI');
 
 //Mongoose translates data from mongodb using a model
@@ -36,17 +38,49 @@ var bookRouter = express.Router()
 //http://expressjs.com/4x/api.html#router.route
 bookRouter.route('/Books')
 	.get(function(req, res){
-		//var responseJson = {hello: "This is my api"};
-		Book.find(function(err, books){
+		
+
+		/*
+		var query = req.query;
+		NOTE--> http://localhost:8000/api/books?genre=Historical%20Fiction
+		Mongoose takes the '?genre=X' format and translates into a json object
+			{
+				genre: Historical Fuction
+			}
+		And then very politely puts that as a 'query' object on the request
+		*/
+
+		//This is a way kind sanitizing.
+		//This only allows for genre queries to be made 
+		// and not something silly like-->   ...?genre99=Fiction)
+		var query = {};
+		if (req.query.genre)
+			query = req.query;
+
+		Book.find(query, function(err, books){
 			if(err)
-				res.send(err);
+				res.status(500).send(err);
 			else
 				res.json(books);
-
-		});
-		//res.json(responseJson);
+		});		
 	});
 
+//Lets create a new router that will take anything in the format
+// http://localhost:8000/api/books/somethinghere7372abcx839
+// I *think* the colon : notation will assign the somethinghere837942djhdsf 
+// as a param with the name 'bookId'
+bookRouter.route('/Books/:bookId')
+	.get(function(req, res){
+	
+	var param = req.params.bookId; //get param=bookId from request
+	Book.findById(param, function(err, book){  //Note new method: findbyId
+			if(err)
+				res.status(500).send(err);
+			else
+				res.json(book);
+	})
+
+	});
 
 //the use method "mounts the middleware functions" at the path
 //http://expressjs.com/guide/using-middleware.html
