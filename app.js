@@ -3,10 +3,9 @@
 with a lot of neat methods to handle common
 functionalities in web application */
 
-var express  = require('express'),
-    mongoose = require('mongoose');
-
-var app = express(); //create an instance of express so we can use all the cool functionality it provides:D
+var express = require('express'),
+    mongoose = require('mongoose'),
+    bodyParser = require('body-parser');
 
 //starts up our database
 var db = mongoose.connect('mongodb://localhost/bookAPI');
@@ -15,6 +14,7 @@ var db = mongoose.connect('mongodb://localhost/bookAPI');
 //This is the mongoose model for our book
 var Book = require('./models/bookModel');
 
+var app = express(); //create an instance of express so we can use all the cool functionality it provides:D
 
 //**PORT ASSIGNMENT**//
 //Assign a port that our server should listen to
@@ -25,11 +25,24 @@ var Book = require('./models/bookModel');
 
 port = process.env.PORT || 3000;
 
-//*HANDLING ROUTES*/
+//once loaded, these parsers will look at the req body, locate any JSON objects
+//and then attach them to the request object (req.body)
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
 
 //We are going to create a router for a 
 //particular URL. 
 var bookRouter = express.Router()
+
+/* MIDDLEWARE HANDLING */
+//The use method "mounts the middleware functions" at the path
+//http://expressjs.com/guide/using-middleware.html
+app.use('/api', bookRouter);  //this is the router we created easiler
+
+
+
+
+//*HANDLING ROUTES*/
 
 //Anytime a request for this URL
 //occurs it gets passed to this router
@@ -38,6 +51,26 @@ var bookRouter = express.Router()
 //use to handle HTTP verbs
 //http://expressjs.com/4x/api.html#router.route
 bookRouter.route('/Books')
+	.post(function(req,res){
+
+		/* 
+			We want to pass post data into this book 
+			We need a body parser for this
+			The body parser is a a middleware that can read the body
+			and put into a nice JSON object that we understand
+		*/
+		//The parser has added json object to req body.
+		//I have no clue what this line of code is doing..
+		//Book requires to our bookModel.js 
+		//but there are no function Book() constructors
+		var book = new Book(req.body);  
+
+		book.save(); //where does this method come from?!
+		//console.log(book.__proto__);
+		res.status(201).send(book);
+
+
+	})
 	.get(function(req, res){
 		
 
@@ -83,9 +116,7 @@ bookRouter.route('/Books/:bookId')
 
 	});
 
-//the use method "mounts the middleware functions" at the path
-//http://expressjs.com/guide/using-middleware.html
-app.use('/api', bookRouter);
+
 
 //Another way to crete routes -- application level middleware
 //The '/' indicates the root of our site. 
