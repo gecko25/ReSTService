@@ -89,16 +89,20 @@ bookRouter.route('/:bookId')
 		})
 	
 	.put(function(req,res){
-				//the book that mongo got from db, which we put on the req, needs to be updated
-				//the user input that we use to update is on the request body 
-				req.book.author = req.body.author;
-				req.book.title = req.body.title;
-				req.book.genre = req.body.genre;
-				req.book.read = req.body.read;
-				req.book.save();
-				res.json(book);
-				//res.status(201).send(book);
+		//the book that mongo got from db, which we put on the req, needs to be updated
+		//the user input that we use to update is on the request body 
+		req.book.author = req.body.author;
+		req.book.title = req.body.title;
+		req.book.genre = req.body.genre;
+		req.book.read = req.body.read;
+		
+		req.book.save(function(err){
+			if (err)
+				res.status(404).send(err);
+			else
+				res.json(req.book);
 			})
+		
 	.patch(function(req, res){
 		//do not allow user to update the id
 		if (req.body._id)
@@ -124,8 +128,11 @@ bookRouter.route('/:bookId')
 		// if (req.book.read)
 		// 	req.book.read = req.body.read;
 
-		req.book.save();
-		res.json(req.book);
+		req.book.save(function(err){
+			if (err)
+				res.status(404).send(err);
+			else
+				res.json(req.book);
 	});
 
 	return bookRouter;
