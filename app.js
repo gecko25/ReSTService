@@ -7,11 +7,11 @@ var express = require('express'),
     mongoose = require('mongoose'),
     bodyParser = require('body-parser');
 
+//Mongoose translates data from mongodb using a model -This is the mongoose model for our book
 var Book = require('./models/bookModel');
 
+//For any traffic dealing with /Books, let our BookRouter handle that. Pass it the Book model.
 var bookRouter = require('./Routes/bookRoutes')(Book);
-//Mongoose translates data from mongodb using a model -This is the mongoose model for our book
-
 
 //starts up our database
 var db = mongoose.connect('mongodb://localhost/bookAPI');

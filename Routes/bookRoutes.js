@@ -15,7 +15,6 @@ var bookRouter = express.Router()
 //http://expressjs.com/4x/api.html#router.route
 bookRouter.route('/')
 	.post(function(req,res){
-
 		/* 
 			We want to pass post data into this book 
 			We need a body parser for this
@@ -35,8 +34,6 @@ bookRouter.route('/')
 
 	})
 	.get(function(req, res){
-		
-
 		/*
 		var query = req.query;
 		NOTE--> http://localhost:8000/api/books?genre=Historical%20Fiction
@@ -62,40 +59,74 @@ bookRouter.route('/')
 		});		
 	});
 
-//Lets create a new router that will take anything in the format
+//Lets create a new route handler that will take anything in the format
 // http://localhost:8000/api/books/somethinghere7372abcx839
 // I *think* the colon : notation will assign the somethinghere837942djhdsf 
 // as a param with the name 'bookId'
+
+//Lets get our repeated code out of here and add some middleware.
+bookRouter.use('/:bookId', function(req, res, next){
+	var param = req.params.bookId;
+
+	Book.findById(param, function(err, book){ //findById method comes from mongoose
+		if (err)
+			res.status(500).send(err)
+		else if (book) {
+			console.log("book=" + book);
+			req.book = book; //add the JSON book directly to incoming req
+			next();   //call any HTTP methods assigned to this bookRouter
+		}
+		else{
+			res.status(404).send(err); //resource was not found
+		}
+	})
+});
+
+
 bookRouter.route('/:bookId')
 	.get(function(req, res){	
-	var param = req.params.bookId; //get param=bookId from request
-	Book.findById(param, function(err, book){  //Note new method: findbyId
-			if(err)
-				res.status(500).send(err);
-			else
-				res.json(book);
+				res.json(req.book);
 		})
-	})
-	//put is a way to edit existing data
+	
 	.put(function(req,res){
-		//first have to get it from the db
-		Book.findById(req.params.bookId, function(err, book){  //Note new method: findbyId
-			if(err){
-				res.status(500).send(err);
-			}else{
-				//before we return the book we need to update it with the information the request
-				console.log(book);
-				book.author = req.body.author;
-				book.title = req.body.title;
-				book.genre = req.body.genre;
-				book.read = req.body.read;
-				book.save();
-
+				//the book that mongo got from db, which we put on the req, needs to be updated
+				//the user input that we use to update is on the request body 
+				req.book.author = req.body.author;
+				req.book.title = req.body.title;
+				req.book.genre = req.body.genre;
+				req.book.read = req.body.read;
+				req.book.save();
 				res.json(book);
 				//res.status(201).send(book);
-			}	
-		})
-	})
+			})
+	.patch(function(req, res){
+		//do not allow user to update the id
+		if (req.body._id)
+			delete req.body._id;
+		
+		console.log("req.book="+req.book);
+		
+		//only update the params that user has updated (req.body.??)
+		for (var p in req.body){
+				console.log("p="+p);
+				req.book[p] = req.body[p];
+		}
+
+		// if (req.body.author)
+		// 	req.book.author = req.body.author;
+
+		// if (req.body.author)
+		// 	req.book.title = req.body.title;
+
+		// if (req.body.genre)
+		// 	req.book.genre = req.body.genre;
+			
+		// if (req.book.read)
+		// 	req.book.read = req.body.read;
+
+		req.book.save();
+		res.json(req.book);
+	});
 
 	return bookRouter;
 };
