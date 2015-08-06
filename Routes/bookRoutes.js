@@ -102,7 +102,7 @@ bookRouter.route('/:bookId')
 			else
 				res.json(req.book);
 			})
-		
+
 	.patch(function(req, res){
 		//do not allow user to update the id
 		if (req.body._id)
@@ -115,18 +115,6 @@ bookRouter.route('/:bookId')
 				console.log("p="+p);
 				req.book[p] = req.body[p];
 		}
-
-		// if (req.body.author)
-		// 	req.book.author = req.body.author;
-
-		// if (req.body.author)
-		// 	req.book.title = req.body.title;
-
-		// if (req.body.genre)
-		// 	req.book.genre = req.body.genre;
-			
-		// if (req.book.read)
-		// 	req.book.read = req.body.read;
 
 		req.book.save(function(err){
 			if (err)
