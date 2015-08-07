@@ -72,12 +72,11 @@ var routes = function(Book){
 			if (err)
 				res.status(500).send(err)
 			else if (book) {
-				console.log("book=" + book);
 				req.book = book; //add the JSON book directly to incoming req
 				next();   //call any HTTP methods assigned to this bookRouter
 			}
 			else{
-				res.status(404).send(err); //resource was not found
+				res.status(404).send("Oops! We couldn't find the book you were looking for!"); //resource was not found
 			}
 		})
 	});
@@ -123,6 +122,20 @@ var routes = function(Book){
 					res.json(req.book);
 				}	
 			});
+		})
+		.delete(function(req,res){
+			req.book.remove(function(err, book){
+				if (err){
+					res.status(404).send(err);
+				}else{
+					res.status(204).send("Removed book" + book.title);
+					console.log("removed book" + book.title);
+				}
+
+		});
+
+
+
 		});
 
 	return bookRouter;
