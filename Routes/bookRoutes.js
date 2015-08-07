@@ -81,7 +81,6 @@ var routes = function(Book){
 		})
 	});
 
-
 	bookRouter.route('/:bookId')
 		.get(function(req, res){	
 			res.json(req.book);
@@ -129,7 +128,6 @@ var routes = function(Book){
 					res.status(404).send(err);
 				}else{
 					res.status(204).send("Removed book" + book.title);
-					console.log("removed book" + book.title);
 				}
 
 		});
