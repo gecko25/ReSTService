@@ -1,3 +1,5 @@
+'use strict'
+
 /**
  ** The file that gulp looks to for configuration.
  ** When gulp runs, it is going to look for this file.

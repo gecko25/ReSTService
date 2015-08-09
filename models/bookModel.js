@@ -1,3 +1,5 @@
+'use strict'
+
 //Mongoose translates data from mongodb using a model
 
 var mongoose = require('mongoose'),
@@ -11,6 +13,7 @@ var bookModel = new Schema({
     genre: {type: String},
     read: {type: Boolean, default:false}
 });
+
 
 //Were going to load this model into mongoose 
 //& call it 'Book'

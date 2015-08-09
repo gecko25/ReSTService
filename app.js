@@ -1,3 +1,5 @@
+'use strict'
+
 /* What is express? */
 /* It is a web framework that provides node 
 with a lot of neat methods to handle common
@@ -11,7 +13,7 @@ var express = require('express'),
 var Book = require('./models/bookModel');
 
 //For any traffic dealing with /Books, let our BookRouter handle that. Pass it the Book model.
-var bookRouter = require('./Routes/bookRoutes')(Book);
+var bookRouter = require('./routes/bookRoutes')(Book);
 
 //starts up our database
 var db = mongoose.connect('mongodb://localhost/bookAPI');
